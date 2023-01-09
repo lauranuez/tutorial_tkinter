@@ -12,7 +12,6 @@ def on_message(cli, userdata, message):
     if message.topic == 'videoFrame':
         jpg_original = base64.b64decode(message.payload)
         leftFrameClass.SetFrame(jpg_original)
-        print('video frame received')
 
 def ConnectButtonClicked():
     global connected
