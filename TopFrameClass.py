@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from ParameterFrameClass import ParameterFrameClass
+from MapFrameClass import MapFrameClass
 class TopFrameClass:
 
     def buildFrame(self,fatherFrame, client):
@@ -25,7 +26,7 @@ class TopFrameClass:
         self.value = tk.StringVar()
         self.valueLabel = tk.Label(self.TopFrame, borderwidth=2, relief="groove", textvariable=self.value)
         self.valueLabel.grid(row=0, column=3, padx=5, pady=5, sticky="nesw")
-        self.Button5 = tk.Button(self.TopFrame, text="Button 5", bg='pink', fg="black", command=self.button1Clicked)
+        self.Button5 = tk.Button(self.TopFrame, text="Maps", bg='pink', fg="black", command=self.mapsClicked)
         self.Button5.grid(row=1, column=0, columnspan=4, padx=5, pady=5, sticky="nesw")  # columnspan =4 -> expande 4 columnas
 
         self.inputFrame = tk.Frame(self.TopFrame)
@@ -67,6 +68,16 @@ class TopFrameClass:
 
     def putValue(self, value):
         self.value.set(value)
+
+    def mapsClicked(self):
+        newWindow = tk.Toplevel(self.TopFrame) # Creamos  new Window asociada a la pantalla donde estamos = TopFrame
+        newWindow.title("Flight plan design")
+
+        # sets the geometry of toplevel
+        newWindow.geometry("1200x700")
+        mapFrameClass = MapFrameClass()
+        mapFrame = mapFrameClass.buildFrame(newWindow)
+        mapFrame.pack(fill="both", expand="yes", padx=10, pady=10)
 
 
 
