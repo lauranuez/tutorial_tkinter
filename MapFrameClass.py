@@ -9,6 +9,16 @@ class MapFrameClass:
     def buildFrame(self, fatherFrame):
         self.fatherFrame = fatherFrame
         self.MapFrame = tk.Frame(fatherFrame)
+
+        self.MapFrame.rowconfigure(0, weight=1)
+        self.MapFrame.rowconfigure(1, weight=1)
+
+        self.MapFrame.columnconfigure(0, weight=1)
+        self.MapFrame.columnconfigure(1, weight=1)
+        self.MapFrame.columnconfigure(2, weight=1)
+        self.MapFrame.columnconfigure(3, weight=1)
+        self.MapFrame.columnconfigure(4, weight=1)
+
         self.startingNewWP = False
 
         self.planning = False
@@ -17,18 +27,18 @@ class MapFrameClass:
         self.markers = []
 
         self.button1 = tk.Button(self.MapFrame, width=10, text="Start", bg='green', fg="white", command=self.start)
-        self.button1.grid(row=0, column=0, padx=5, pady=5)
+        self.button1.grid(row=0, column=0, padx=5, pady=5, sticky="nesw")
         self.button2 = tk.Button(self.MapFrame, width=10, text="Finish", bg='red', fg="white", command=self.finish)
-        self.button2.grid(row=0, column=1, padx=5, pady=5)
+        self.button2.grid(row=0, column=1, padx=5, pady=5,sticky="nesw")
         self.button3 = tk.Button(self.MapFrame, width=10, text="Clear", bg='blue', fg="white", command=self.clear)
-        self.button3.grid(row=0, column=2, padx=5, pady=5)
-        self.button4 = tk.Button(self.MapFrame, width=10, text="Save flight plan", bg='blue', fg="white", command=self.save)
-        self.button4.grid(row=0, column=3, padx=5, pady=5)
-        self.button5 = tk.Button(self.MapFrame, width=10, text="Load flight plan", bg='blue', fg="white", command=self.load)
-        self.button5.grid(row=0, column=4, padx=5, pady=5)
+        self.button3.grid(row=0, column=2, padx=5, pady=5, sticky="nesw")
+        self.button4 = tk.Button(self.MapFrame, width=10, text="Save flight plan", bg='pink', fg="black", command=self.save)
+        self.button4.grid(row=0, column=3, padx=5, pady=5, sticky="nesw")
+        self.button5 = tk.Button(self.MapFrame, width=10, text="Load last flight plan", bg='yellow', fg="black", command=self.load)
+        self.button5.grid(row=0, column=4, padx=5, pady=5, sticky="nesw")
 
         self.map_widget = tkintermapview.TkinterMapView(self.MapFrame, width=800, height=600, corner_radius=0)
-        self.map_widget.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
+        self.map_widget.grid(row=1, column=0, columnspan = 5, padx=5, pady=5, sticky="nesw")
         self.map_widget.set_tile_server("https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&s=Ga", max_zoom=22)
         self.map_widget.set_position(41.275946, 1.987475)
         self.map_widget.set_zoom(20)
@@ -50,8 +60,7 @@ class MapFrameClass:
         self.table.heading("#0", text="", anchor=tk.CENTER)
         self.table.heading("Lat", text="Lat", anchor=tk.CENTER)
         self.table.heading("Lng", text="Lng", anchor=tk.CENTER)
-        self.table.grid(row=1, column=2, padx=5, pady=5)
-
+        self.table.grid(row=1, column=5, padx=5, pady=5, sticky="nesw")
         return self.MapFrame
 
     def add_marker_event(self, position):
@@ -127,14 +136,16 @@ class MapFrameClass:
     def load(self):
         URL = "http://localhost:4000/data"
         r = requests.get(url=URL)
-
-        # extracting data in json format
         data = r.json()
-        print('stored flight plans ', data[-1])
+        lastFlightPlan = data[-1]
+        self.count = 0
+        for wp in lastFlightPlan:
+            self.count = self.count + 1
+            marker = self.map_widget.set_marker(wp[0], wp[1], text=self.count)
+
 
     def save(self):
-        result = messagebox.askquestion(parent=self.MapFrame, title='Save flight plan', message='Are you sure?',
-                                        icon='warning')
+        result = messagebox.askquestion(parent=self.MapFrame, title='Save flight plan', message='Are you sure?', icon='warning')
         if result == 'yes':
             URL = "http://localhost:4000/data"
             x = requests.post(URL, json=self.positions)
