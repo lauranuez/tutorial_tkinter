@@ -1,6 +1,7 @@
 import tkinter as tk
 import tkintermapview
 import mpu
+from  tkinter import ttk
 
 class MapFrameClass:
 
@@ -30,6 +31,22 @@ class MapFrameClass:
 
         self.map_widget.add_right_click_menu_command(label="Insert WP", command=self.add_marker_event,pass_coords=True)
 
+        self.table = ttk.Treeview(self.MapFrame)
+        s = ttk.Style()
+        s.theme_use('clam')
+        self.tcount = 0
+
+        # Configure the style of Heading in Treeview widget
+        s.configure('Treeview.Heading', background="green3")
+
+        self.table['columns'] = ('Lat', 'Lng')
+        self.table.column("#0", width=0, stretch=tk.NO)
+        self.table.column('Lat', anchor=tk.CENTER, width=120)
+        self.table.column("Lng", anchor=tk.CENTER, width=120)
+        self.table.heading("#0", text="", anchor=tk.CENTER)
+        self.table.heading("Lat", text="Lat", anchor=tk.CENTER)
+        self.table.heading("Lng", text="Lng", anchor=tk.CENTER)
+        self.table.grid(row=1, column=2, padx=5, pady=5)
 
         return self.MapFrame
 
@@ -38,6 +55,9 @@ class MapFrameClass:
             self.count = self.count + 1
             marker = self.map_widget.set_marker(position[0], position[1], text=self.count)
             self.startingNewWP = True
+            self.table.insert(parent='', index='end', iid=self.tcount, text='',
+                              values=(round(position[0], 5), round(position[1], 5)))
+            self.tcount = self.tcount + 1
 
             if self.count > 1:
                 path = self.map_widget.set_path([self.positions[-1], position], color='red')
@@ -62,6 +82,7 @@ class MapFrameClass:
         self.paths.append(path)
         if self.currentPath:
             self.currentPath.delete()
+        self.map_widget.canvas.delete(self.distance)
         self.map_widget.canvas.unbind("<Motion>")
 
 
@@ -74,6 +95,15 @@ class MapFrameClass:
         for path in self.paths:
             path.delete()
         self.paths = []
+        self.coords = []
+        self.map_widget.canvas.delete('distance')
+        if self.currentPath:
+            self.currentPath.delete()
+        for i in self.table.get_children():
+            self.table.delete(i)
+
+        self.tcount = 0
+
 
     def drag(self, e):
         if self.startingNewWP:
