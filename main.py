@@ -4,6 +4,8 @@ from TopFrameClass import TopFrameClass
 from RightFrameClass import RightFrameClass
 from LeftFrameClass import LeftFrameClass
 import paho.mqtt.client as mqtt
+import socketio
+from tkinter import messagebox
 
 def on_message(cli, userdata, message):
     if message.topic == 'Value':
@@ -15,12 +17,16 @@ def on_message(cli, userdata, message):
 
 def ConnectButtonClicked():
     global connected
+    global sio
+    global client
+
     if not connected:
         ConnectButton['text'] = 'Disconnect'
         ConnectButton['bg'] = 'green'
         connected = True
         MainFrame.pack(fill="both", expand="yes", padx=10, pady=10)
         client.publish('Connect')
+        sio.emit('connectPlatform')
     else:
         ConnectButton['text'] = 'Connect'
         ConnectButton['bg'] = 'red'
@@ -62,6 +68,13 @@ topFrameClass.setRightFrame(rightFrameClass)
 
 BottomFrame = tk.LabelFrame(MainFrame, text='Bottom')
 BottomFrame.pack(fill="both", expand="yes", padx=10, pady=5)
+
+sio = socketio.Client()
+sio.connect('http://localhost:5000')
+
+@sio.on('connected')
+def on_message(data):
+    messagebox.showinfo('Wellcom message', data)
 
 root.mainloop()
 
